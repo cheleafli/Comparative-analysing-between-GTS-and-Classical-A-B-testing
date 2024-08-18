@@ -1,0 +1,6 @@
+install.packages("knitr")
+install.packages("rmarkdown")
+install.packages("survival")
+install.packages("tidyverse")
+install.packages("gsDesign")
+Sys.setlocale("LC_ALL", "en_US.UTF-8")
