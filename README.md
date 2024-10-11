@@ -1,22 +1,13 @@
-library(rpact)
-# Example: beta-spending function approach with O'Brien & Fleming alpha-spending
-# function and Pocock beta-spending function
-design1 <- getDesignGroupSequential(kMax = 5,
-    sided = 2, alpha = 0.05, beta = 0.2,
-    informationRates = c(0.2, 0.4, 0.6,0.8,1),
-    typeOfDesign = "asOF",
-    typeBetaSpending = "bsP",bindingFutility = FALSE
-)
-# Sample size calculation assuming event probabilities of in control and treatment
-# (pi2 controal) vs (pi1 treatment) in intervention
-sampleSizeResultGS1 <- getSampleSizeRates(design1, pi2 = reten_1_30, pi1 = reten_1_40,
-                                         sided = 2, alpha = 0.05, beta = 0.2)
-# Standard rpact output (sample size object only, not design object)
-kable(sampleSizeResultGS1)
-kable(summary(sampleSizeResultGS1))
+A/B testing is a typical form of online controlled experiments (OCES), which is essential the randomised controlled trails (RCT) on the Internet and Web. A or B groups (0 or 1) are only two levels treatment factor $X_i$ to impact specific assessment metric $Y_i$. In this case, A/B testing is a golden standard to estimate causal effect size of two groups because randomisation minimised the interference from confounding factors. The randomisation means all experimental users are assigned to A or B group randomly by traffic allocation 50%. After randomisation, A/B testing require adequate sample size based on specified type I and II error $\alpha\,;\beta$ and statistical power $1\-\beta$. Sufficient sample size provide statistical evidence of whether there is a metric difference between A and B group theoretically. Only A/B testing satisfied sufficient sample size and specific testing statistics, the hypothesis results of metrics could be effective and significant. A smaller effect size (metric difference of two groups ) require larger sample size, and higher statistical power requires larger sample size.
 
-designChar <- getDesignCharacteristics(design1)
-kable(designChar)
+However, the sample size for A/B testing may be thousands and millions due to tiny calculated effect size. Inadequate sample size cannot get trustworthy causal result because of low statistical power with high type II error. Therefore, sequential testing is a optional stopping method compared to classical A/B testing by continuous monitoring and peeking. It do not pre-calculated fixed sample size based on specific power, so the sample size is dynamic and flexible. Common sequential testing methods are sequential probability ratio (SPRT) and group sequential testing (GST). For GST, the greatest controlled power performance is the advantage better than SPRT. We selected GST as final sequential testing method to do comparative case study compared with classical fixed sample size A/B testing.
 
-plot(design,type = 1, showSource = TRUE)
-plot(design,type = 4, showSource = TRUE)
+The selected case datasets collected from online public datasets in Kaggle and DataCamp, and these two datasets comes from the same mobile game: "Cookie Cats", and they are original dataset and its subset. The sample size for these two datasets respectively are 90187 and 88000. The goal metrics of assessment are average gamerounds (AG), day 1 retention rate (RA1), day 7 retention rate (RA7). Split group A is gate30, and B group is gate40.
+
+In classical A/B testing, the total calculated fixed sample size based on $\alpha$ =5%, $\beta$=20% for AG $\approx$ 1009039, for RA1 $\approx$ 242153, for RA7 $\approx$ 87211. Maximum available sample size is 88000, so we cannot get enough 80% power for AG and RA1 hypothesis testing, and the testing result for RA7 is there is a difference existing between A and B group rejecting null hypothesis, so gate 30 has 0.74% day7 retention rate uplifting compared to gate40.
+
+Then using GST shows comparative testing results. Supposing peeking times is 10, AG cannot get significant testing result due to insufficient sample size at stage1 is 144687.6. Supposing peeking times is 5, RA1 cannot get significant testing result due to insufficient sample size at stage2 is 116870.65. Supposing peeking time is 5, RA7 can get effective and feasible testing result through stop early. The stopping sample size is 63139.2, and the savings rate for RA7 is approx to 27.60%.
+
+In conclusion, two findings are summarised through above comparative case study. First finding is GST is not always feasible to stop experiment early. When ASN \> Maximum available sample size, GTS is inefficient and cannot stop early. For AG, the ASN under H0 is 712571.6 \> 88000. For RA1, the ASN under H0 is 172571.6 \> 88000. For RA7, the ASN under H1 is 74013.43 \< 88000. Second finding is GST can average save 28.58% sample size in this case compared to fixed sample size. The savings rates for AG is 29.41% (by ASN under H0), for RA1 is 28.73% (by ASN under H0), and for RA7 is 27.6% (by hypothesis testing). Thus, GST is a effective method to stop early if the effect size is a significant difference in classical A/B testing.
+
+In the future research, people can try combine improving sensitivity methods and sequential A/B testing in order to minimising dynamic sample size compared to fixed sample size.
